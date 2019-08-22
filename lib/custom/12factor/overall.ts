@@ -58,48 +58,52 @@ export const TwelveFactor: Aspect<TwelveFactorData> = {
 };
 
 export const twelveFactorOverAll: CombinationTagger = {
-    name: "twelveFactorOverall",
+    name: "twelve-factor-compliant",
     description: "Twelve Factor Compliant",
     test: fps => {
-        const data = fps.find(fp => fp.type === TwelveFactor.name).data;
-        return data.a.compliant && data.b.compliant && data.c.compliant;
+        const a = fps.find(fp => fp.type === TwelveFactor.name && fp.name === "tier-a").data;
+        const b = fps.find(fp => fp.type === TwelveFactor.name && fp.name === "tier-b").data;
+        const c = fps.find(fp => fp.type === TwelveFactor.name && fp.name === "tier-c").data;
+        return a.compliant && b.compliant && c.compliant;
     },
 };
 
 export const twelveFactorTierA: CombinationTagger = {
-    name: "twelveFactorTierA",
+    name: "twelve-factor-tier-a",
     description: "Twelve Factor Tier A Compliant",
     test: fps => {
-        const data = fps.find(fp => fp.type === TwelveFactor.name).data;
-        return data.a.compliant;
+        const a = fps.find(fp => fp.type === TwelveFactor.name && fp.name === "tier-a").data;
+        return a.compliant;
     },
 };
 
 export const twelveFactorTierB: CombinationTagger = {
-    name: "twelveFactorTierB",
+    name: "twelve-factor-tier-b",
     description: "Twelve Factor Tier B Compliant",
     test: fps => {
-        const data = fps.find(fp => fp.type === TwelveFactor.name).data;
-        return data.b.compliant;
+        const b = fps.find(fp => fp.type === TwelveFactor.name && fp.name === "tier-b").data;
+        return b.compliant;
     },
 };
 
 export const twelveFactorTierC: CombinationTagger = {
-    name: "twelveFactorTierC",
+    name: "twelve-factor-tier-c",
     description: "Twelve Factor Tier C Compliant",
     test: fps => {
-        const data = fps.find(fp => fp.type === TwelveFactor.name).data;
-        return data.c.compliant;
+        const c = fps.find(fp => fp.type === TwelveFactor.name && fp.name === "tier-c").data;
+        return c.compliant;
     },
 };
 
 export function isTwelveFactor(): RepositoryScorer {
     return async repo => {
         let score = 0;
-        const data = repo.analysis.fingerprints.find(fp => fp.type === TwelveFactor.name).data;
-        if (data.a.compliant) { score++; }
-        if (data.b.compliant) { score++; }
-        if (data.c.compliant) { score++; }
+        const a = repo.analysis.fingerprints.find(fp => fp.type === TwelveFactor.name && fp.name === "tier-a").data;
+        const b = repo.analysis.fingerprints.find(fp => fp.type === TwelveFactor.name && fp.name === "tier-b").data;
+        const c = repo.analysis.fingerprints.find(fp => fp.type === TwelveFactor.name && fp.name === "tier-c").data;
+        if (a.compliant) { score++; }
+        if (b.compliant) { score++; }
+        if (c.compliant) { score++; }
 
         if (score === 3) {
             score = 5; // Set to best possible for satisfying reqs
