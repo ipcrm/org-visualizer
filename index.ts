@@ -247,7 +247,7 @@ export const configuration: Configuration = configure(async sdm => {
                         sdmConfigClientFactory(cfg),
                         cfg.http.client.factory,
                     );
-                cfg.http.customizers = customizers;
+                cfg.http.customizers.push(...customizers);
                 routesToSuggestOnStartup.forEach(rtsos => {
                     cfg.logging.banner.contributors.push(suggestRoute(rtsos));
                 });

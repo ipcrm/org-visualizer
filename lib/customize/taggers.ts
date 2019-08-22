@@ -27,6 +27,10 @@ import { PythonDependencies } from "../aspect/python/pythonDependencies";
 import { DirectMavenDependencies } from "../aspect/spring/directMavenDependencies";
 import { SpringBootVersion } from "../aspect/spring/springBootVersion";
 import { TravisScriptsAspect } from "../aspect/travis/travisAspects";
+import {twelveFactorOverAll} from "../custom/12factor/overall";
+import {isTierACompliant} from "../custom/12factor/tierA";
+import {isTierBCompliant} from "../custom/12factor/tierB";
+import {isTierCCompliant} from "../custom/12factor/tierC";
 import * as commonTaggers from "../tagger/commonTaggers";
 import * as nodeTaggers from "../tagger/nodeTaggers";
 
@@ -122,6 +126,9 @@ export function taggers(opts: Partial<TaggersParams>): Tagger[] {
         commonTaggers.HasContributingFile,
         commonTaggers.HasLicense,
         commonTaggers.dead(optsToUse),
+        isTierACompliant,
+        isTierBCompliant,
+        isTierCCompliant,
     ];
 }
 
@@ -168,5 +175,6 @@ export function combinationTaggers(opts: Partial<CombinationTaggersParams>): Com
             },
         },
         commonTaggers.gitHot(optsToUse),
+        twelveFactorOverAll,
     ];
 }

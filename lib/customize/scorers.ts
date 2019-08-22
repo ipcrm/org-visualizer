@@ -21,6 +21,7 @@ import {
 } from "@atomist/sdm-pack-sloc/lib/languages";
 import { RepositoryScorer } from "../aspect/AspectRegistry";
 import { CodeOfConductType } from "../aspect/community/codeOfConduct";
+import {isTwelveFactor} from "../custom/12factor/overall";
 import {
     anchorScoreAt,
     limitLanguages,
@@ -64,4 +65,5 @@ export const Scorers: RepositoryScorer[] = [
     requireAspectOfType({ type: CodeOfConductType, reason: "Repos should have a code of conduct" }),
     requireGlobAspect({ glob: "CHANGELOG.md" }),
     requireGlobAspect({ glob: "CONTRIBUTING.md" }),
+    isTwelveFactor(),
 ];

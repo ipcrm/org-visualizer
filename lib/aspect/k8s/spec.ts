@@ -111,7 +111,7 @@ export function isK8sSpec(o: any): o is K8sObject {
     return o.apiVersion && o.kind && o.metadata && o.metadata.name;
 }
 
-const k8sSpecGlob = "*.@(json|yaml|yml)";
+const k8sSpecGlob = "**/*.@(json|yaml|yml)";
 
 export const createK8sSpecsFingerprints: ExtractFingerprint<K8sObject> = async p => {
     const fingerprints: Array<FP<K8sObject>> = [];
