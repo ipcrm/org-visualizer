@@ -43,9 +43,7 @@ import {
     DockerFrom,
     DockerPorts,
 } from "@atomist/sdm-pack-docker";
-import {
-    fingerprintSupport,
-} from "@atomist/sdm-pack-fingerprints";
+import { fingerprintSupport } from "@atomist/sdm-pack-fingerprints";
 import * as _ from "lodash";
 import { ClientFactory } from "./lib/analysis/offline/persist/pgUtils";
 import {
@@ -82,6 +80,7 @@ import {
     combinationTaggers,
     taggers,
 } from "./lib/customize/taggers";
+import { CreatePolicyLogOnPullRequest } from "./lib/event/policyLog";
 import {
     CreateFingerprintJob,
     CreateFingerprintJobCommand,
@@ -203,6 +202,7 @@ export const configuration: Configuration = configure(async sdm => {
             };
         } else {
             sdm.addEvent(CreateFingerprintJob);
+            sdm.addEvent(CreatePolicyLogOnPullRequest);
             sdm.addCommand(CreateFingerprintJobCommand);
             sdm.addCommand(calculateFingerprintTask(jobAspects, handlers));
             return {};
