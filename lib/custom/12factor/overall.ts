@@ -1,67 +1,112 @@
 import {Aspect, sha256} from "@atomist/sdm-pack-fingerprints";
 import {CombinationTagger, RepositoryScorer} from "../../aspect/AspectRegistry";
-import {CodeMetricsType} from "../../aspect/common/codeMetrics";
 import {FiveStar} from "../../scorer/Score";
-import {adjustBy} from "../../scorer/scoring";
-import {meetsTierARequirements, TwelveFactorTierA, TwelveFactorTierAType} from "./tierA";
-import {meetsTierBRequirements, TwelveFactorTierB} from "./tierB";
-import {meetsTierCRequirements, TwelveFactorTierC} from "./tierC";
+import {meetsTierARequirements} from "./tierA";
+import {meetsTierBRequirements} from "./tierB";
+import {meetsTierCRequirements} from "./tierC";
+
+interface TwelveFactorData {
+    compliant: boolean;
+}
+
+export const TwelveFactorOverallType = "twelve-facter-overall";
+export const TwelveFactor: Aspect<TwelveFactorData> = {
+    name: TwelveFactorOverallType,
+    displayName: "Twelve Factor Compliance",
+    extract: async () => [],
+    consolidate: async fps => {
+        const data: Record<string, TwelveFactorData> = {
+            a: {compliant: meetsTierARequirements(fps)},
+            b: {compliant: meetsTierBRequirements(fps)},
+            c: {compliant: meetsTierCRequirements(fps)},
+        };
+
+        return [
+            {
+                name: "tier-a",
+                type: TwelveFactorOverallType,
+                data: data.a,
+                sha: sha256(JSON.stringify(data.a)),
+            },
+            {
+                name: "tier-b",
+                type: TwelveFactorOverallType,
+                data: data.b,
+                sha: sha256(JSON.stringify(data.b)),
+            },
+            {
+                name: "tier-c",
+                type: TwelveFactorOverallType,
+                data: data.c,
+                sha: sha256(JSON.stringify(data.b)),
+            },
+        ];
+    },
+    toDisplayableFingerprintName: fp => {
+        let name: string;
+        if (fp === "tier-a") {
+            name = "Twelve Factor Tier A Compliant";
+        } else if (fp === "tier-b") {
+            name = "Twelve Factor Tier B Compliant";
+        } else if (fp === "tier-c") {
+            name = "Twelve Factor Tier C Compliant";
+        }
+
+        return name;
+    },
+    toDisplayableFingerprint: fp => fp.data.compliant ? "Yes" : "No",
+};
 
 export const twelveFactorOverAll: CombinationTagger = {
     name: "twelveFactorOverall",
     description: "Twelve Factor Compliant",
     test: fps => {
-        const a = fps.find(fp => fp.type === TwelveFactorTierA.name).data.meetsRequirements;
-        const b = fps.find(fp => fp.type === TwelveFactorTierB.name).data.meetsRequirements;
-        const c = fps.find(fp => fp.type === TwelveFactorTierC.name).data.meetsRequirements;
-
-        return a && b && c;
+        const data = fps.find(fp => fp.type === TwelveFactor.name).data;
+        return data.a.compliant && data.b.compliant && data.c.compliant;
     },
 };
 
-interface TwelveFacterData {
-    tierA: boolean;
-    tierB: boolean;
-    tierC: boolean;
-}
-
-export const TwelveFactorOverallType = "twelve-facter-overall";
-export const TwelveFactor: Aspect<TwelveFacterData> = {
-    name: TwelveFactorOverallType,
-    displayName: "Twelve Factor Compliant",
-    extract: async () => [],
-    consolidate: async fps => {
-        const data: TwelveFacterData = {
-            tierA: meetsTierARequirements(fps),
-            tierB: meetsTierBRequirements(fps),
-            tierC: meetsTierCRequirements(fps),
-        };
-        return {
-            name: TwelveFactorOverallType,
-            type: TwelveFactorOverallType,
-            data,
-            sha: sha256(JSON.stringify(data)),
-        };
+export const twelveFactorTierA: CombinationTagger = {
+    name: "twelveFactorTierA",
+    description: "Twelve Factor Tier A Compliant",
+    test: fps => {
+        const data = fps.find(fp => fp.type === TwelveFactor.name).data;
+        return data.a.compliant;
     },
-    toDisplayableFingerprint: fp => fp.data.tierA && fp.data.tierB && fp.data.tierC ? "Yes" : "No",
+};
+
+export const twelveFactorTierB: CombinationTagger = {
+    name: "twelveFactorTierB",
+    description: "Twelve Factor Tier B Compliant",
+    test: fps => {
+        const data = fps.find(fp => fp.type === TwelveFactor.name).data;
+        return data.b.compliant;
+    },
+};
+
+export const twelveFactorTierC: CombinationTagger = {
+    name: "twelveFactorTierC",
+    description: "Twelve Factor Tier C Compliant",
+    test: fps => {
+        const data = fps.find(fp => fp.type === TwelveFactor.name).data;
+        return data.c.compliant;
+    },
 };
 
 export function isTwelveFactor(): RepositoryScorer {
     return async repo => {
         let score = 0;
-        const a = repo.analysis.fingerprints.find(fp => fp.type === TwelveFactorTierA.name).data.meetsRequirements;
-        const b = repo.analysis.fingerprints.find(fp => fp.type === TwelveFactorTierB.name).data.meetsRequirements;
-        const c = repo.analysis.fingerprints.find(fp => fp.type === TwelveFactorTierC.name).data.meetsRequirements;
-        if (a) { score++; }
-        if (b) { score++; }
-        if (c) { score++; }
+        const data = repo.analysis.fingerprints.find(fp => fp.type === TwelveFactor.name).data;
+        if (data.a.compliant) { score++; }
+        if (data.b.compliant) { score++; }
+        if (data.c.compliant) { score++; }
 
         if (score === 3) {
             score = 5; // Set to best possible for satisfying reqs
         }
 
         return {
-            name: "twelve-facter",
+            name: "twelve-factor",
             score: score as FiveStar,
             reason: `Scored ${score} based on discovered 12 Factor readiness`,
         };

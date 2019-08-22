@@ -52,9 +52,7 @@ import { SpringBootStarter } from "../aspect/spring/springBootStarter";
 import { SpringBootVersion } from "../aspect/spring/springBootVersion";
 import { TravisScriptsAspect } from "../aspect/travis/travisAspects";
 import {TwelveFactor} from "../custom/12factor/overall";
-import {TwelveFactorTierA} from "../custom/12factor/tierA";
-import {HasEnvFiles, TwelveFactorTierB} from "../custom/12factor/tierB";
-import {TwelveFactorTierC} from "../custom/12factor/tierC";
+import {HasEnvFiles} from "../custom/12factor/tierB";
 
 /**
  * This will identify directories containing any of the following files as virtual projects
@@ -108,9 +106,6 @@ export function aspects(): Aspect[] {
         PythonDependencies,
         K8sSpecs,
         LeinDeps,
-        TwelveFactorTierC,
-        TwelveFactorTierB,
-        TwelveFactorTierA,
         TwelveFactor,
     ].map(aspect => makeVirtualProjectAware(aspect, virtualProjectFinder));
 }

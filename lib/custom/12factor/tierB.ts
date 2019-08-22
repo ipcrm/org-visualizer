@@ -1,26 +1,6 @@
 import {projectUtils} from "@atomist/automation-client";
 import {Aspect, FP, sha256} from "@atomist/sdm-pack-fingerprints";
 
-export const TwelveFactorTierBType: string = "12facter-tier-b";
-/**
- * Does this repository meet requirements for Tier B?
- */
-export const TwelveFactorTierB: Aspect<{ meetsRequirements: boolean }> = {
-    name: TwelveFactorTierBType,
-    displayName: "Twelve Factor Tier B Compliant",
-    extract: async () => [],
-    consolidate: async fps => {
-        const data = { meetsRequirements: meetsTierBRequirements(fps) };
-        return {
-            name: TwelveFactorTierBType,
-            type: TwelveFactorTierBType,
-            data,
-            sha: sha256(JSON.stringify(data)),
-        };
-    },
-    toDisplayableFingerprint: fp => fp.data.meetsRequirements ? "Yes" : "No",
-};
-
 export const HasEnvFilesType = "has-env-files";
 export const HasEnvFiles: Aspect<{ files: string[] }> = {
     name: HasEnvFilesType,
@@ -57,8 +37,3 @@ export function meetsTierBRequirements(fps: FP[]): boolean {
     return meetsReqs;
 }
 
-export const isTierBCompliant = {
-    name: "isTierBCompliant",
-    description: "Facter 12 Tier B Compliant",
-    test: fp => fp.name === TwelveFactorTierBType && fp.data.meetsRequirements,
-};
